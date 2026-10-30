@@ -1,0 +1,6 @@
+{
+  "name": "avesur-site",
+  "private": true,
+  "scripts": { "build": "node build.js" },
+  "dependencies": { "cheerio": "1.0.0" }
+}
