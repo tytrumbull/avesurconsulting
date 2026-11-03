@@ -370,3 +370,8 @@ p, ul, ol, dl, dd, figure { margin: 0; }
   .phases .n { padding: 0 0 10px; }
   .example { padding-left: 20px; }
 }
+
+.method.method-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .method.method-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .method.method-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.hero h1 { font-size: clamp(2.2rem, 4.2vw, 3.6rem); }
