@@ -375,3 +375,10 @@ p, ul, ol, dl, dd, figure { margin: 0; }
 @media (max-width: 1100px) { .method.method-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .method.method-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .hero h1 { font-size: clamp(2.2rem, 4.2vw, 3.6rem); }
+
+.lifecycle + .apps { margin-top: 0; }
+.lc-fw { color: var(--text-muted); max-width: 80ch; }
+.lc-fw strong { color: var(--text); font-weight: 600; }
+.lifecycle .phases { margin-top: 24px; }
+.lifecycle .phases li { padding: 22px 0; }
+.lifecycle .phases h3 { font-size: 1.15rem; }
