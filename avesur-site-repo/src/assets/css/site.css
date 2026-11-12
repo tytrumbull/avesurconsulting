@@ -179,6 +179,9 @@ p, ul, ol, dl, dd, figure { margin: 0; }
 .footer-grid a:hover { color: var(--text); text-decoration: underline; }
 .footer-blurb { max-width: 36ch; }
 .footer-base { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.84rem; color: var(--text-faint); }
+.footer-partner { flex-basis: 100%; }
+.footer-partner a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.footer-partner a:hover { color: var(--text); }
 
 /* ---------- inner page openings ---------- */
 .opening { padding: clamp(64px, 9vw, 120px) 0 clamp(48px, 6vw, 80px); }
