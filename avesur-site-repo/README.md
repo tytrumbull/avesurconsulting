@@ -12,3 +12,4 @@ Local preview: `npm install && npm run build`, then serve `dist/` (e.g. `npx ser
 3. Add the custom domain in Netlify; at the DNS host point `@` and `www` to Netlify. Leave MX/email records alone.
 4. Submit https://www.avesurconsulting.ca/sitemap.xml in Google Search Console.
 5. Google Analytics: create a GA4 property, then add the Netlify environment variable `GA4_ID` (e.g. `G-XXXXXXXXXX`) and redeploy. The build adds the tag to every page.
+6. Microsoft Clarity: create a project at clarity.microsoft.com, then add the Netlify environment variable `CLARITY_ID` with the project ID (Clarity > Settings > Overview) and redeploy.

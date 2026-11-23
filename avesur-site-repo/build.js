@@ -6,6 +6,8 @@ const SRC = path.join(__dirname, "src"), SITE = path.join(__dirname, "dist");
 const LIVE = process.env.SITE_LIVE === "true";
 // Google Analytics 4: set the Netlify environment variable GA4_ID (or GA4), e.g. G-XXXXXXXXXX, to add the tag to every page.
 const GA4_ID = ((process.env.GA4_ID || process.env.GA4 || "").toUpperCase().match(/G-[A-Z0-9]+/) || [""])[0];
+// Microsoft Clarity: set the Netlify environment variable CLARITY_ID (or CLARITY) to the project ID from Clarity > Settings > Overview.
+const CLARITY_ID = ((process.env.CLARITY_ID || process.env.CLARITY || "").trim().match(/^[a-z0-9]{6,20}$/i) || [""])[0];
 fs.rmSync(SITE, { recursive: true, force: true });
 fs.cpSync(SRC, SITE, { recursive: true });
 const BASE = "https://www.avesurconsulting.ca/";
@@ -86,6 +88,9 @@ for (const page of PAGES) {
       $("head").append(`\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${GA4_ID}"></script>\n` +
         `  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","${GA4_ID}");</script>\n`);
     }
+    if (CLARITY_ID) {
+      $("head").append(`  <script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_ID}");</script>\n`);
+    }
     const out = path.join(SITE, LANGS[lang].dir, page);
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, $.html());
@@ -106,4 +111,4 @@ fs.writeFileSync(path.join(SITE, "_redirects"), PAGES.flatMap(page => Object.key
   `/${LANGS[lang].dir}${page}  /${LANGS[lang].dir}${clean(page)}  301!`)).join("\n") + "\n");
 fs.writeFileSync(path.join(SITE, "_headers"), (LIVE ? "" : "/*\n  X-Robots-Tag: noindex, nofollow\n") +
   "/assets/*\n  Cache-Control: public, max-age=604800\n");
-console.log("Built " + PAGES.length * 3 + " pages" + (LIVE ? " (live)" : " (noindex)") + (GA4_ID ? ", GA4 " + GA4_ID : ", no GA4"));
+console.log("Built " + PAGES.length * 3 + " pages" + (LIVE ? " (live)" : " (noindex)") + (GA4_ID ? ", GA4 " + GA4_ID : ", no GA4") + (CLARITY_ID ? ", Clarity " + CLARITY_ID : ", no Clarity"));
