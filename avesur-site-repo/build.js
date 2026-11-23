@@ -101,6 +101,9 @@ for (const page of PAGES) for (const lang of Object.keys(LANGS)) {
 }
 fs.writeFileSync(path.join(SITE, "sitemap.xml"), sm + "</urlset>\n");
 fs.writeFileSync(path.join(SITE, "robots.txt"), LIVE ? `User-agent: *\nAllow: /\nSitemap: ${BASE}sitemap.xml\n` : "User-agent: *\nDisallow: /\n");
+// 301 the old .html addresses to the clean URLs
+fs.writeFileSync(path.join(SITE, "_redirects"), PAGES.flatMap(page => Object.keys(LANGS).map(lang =>
+  `/${LANGS[lang].dir}${page}  /${LANGS[lang].dir}${clean(page)}  301!`)).join("\n") + "\n");
 fs.writeFileSync(path.join(SITE, "_headers"), (LIVE ? "" : "/*\n  X-Robots-Tag: noindex, nofollow\n") +
   "/assets/*\n  Cache-Control: public, max-age=604800\n");
 console.log("Built " + PAGES.length * 3 + " pages" + (LIVE ? " (live)" : " (noindex)") + (GA4_ID ? ", GA4 " + GA4_ID : ", no GA4"));
