@@ -4,8 +4,8 @@
 const fs = require("fs"), path = require("path"), cheerio = require("cheerio");
 const SRC = path.join(__dirname, "src"), SITE = path.join(__dirname, "dist");
 const LIVE = process.env.SITE_LIVE === "true";
-// Google Analytics 4: set the Netlify environment variable GA4_ID (e.g. G-XXXXXXXXXX) to add the tag to every page.
-const GA4_ID = /^G-[A-Z0-9]+$/.test(process.env.GA4_ID || "") ? process.env.GA4_ID : "";
+// Google Analytics 4: set the Netlify environment variable GA4_ID (or GA4), e.g. G-XXXXXXXXXX, to add the tag to every page.
+const GA4_ID = ((process.env.GA4_ID || process.env.GA4 || "").toUpperCase().match(/G-[A-Z0-9]+/) || [""])[0];
 fs.rmSync(SITE, { recursive: true, force: true });
 fs.cpSync(SRC, SITE, { recursive: true });
 const BASE = "https://www.avesurconsulting.ca/";
