@@ -4,6 +4,8 @@
 const fs = require("fs"), path = require("path"), cheerio = require("cheerio");
 const SRC = path.join(__dirname, "src"), SITE = path.join(__dirname, "dist");
 const LIVE = process.env.SITE_LIVE === "true";
+// Google Analytics 4: set the Netlify environment variable GA4_ID (e.g. G-XXXXXXXXXX) to add the tag to every page.
+const GA4_ID = /^G-[A-Z0-9]+$/.test(process.env.GA4_ID || "") ? process.env.GA4_ID : "";
 fs.rmSync(SITE, { recursive: true, force: true });
 fs.cpSync(SRC, SITE, { recursive: true });
 const BASE = "https://www.avesurconsulting.ca/";
@@ -16,33 +18,35 @@ const LANGS = { en: { html: "en-CA", og: "en_CA", dir: "" }, fr: { html: "fr-CA"
 const META = {
   fr: {
     "index.html": ["Avesur Consulting | Évaluation indépendante, conformité et accès aux marchés",
-      "Avesur Consulting cerne les exigences entre votre organisation et son objectif, évalue votre situation et vous aide à les franchir. Canada, Mexique et États-Unis."],
+      "Évaluation indépendante, conformité et accès aux marchés au Canada, au Mexique et aux États-Unis. Nous cernons les exigences et vous aidons à les franchir."],
     "services.html": ["Services : évaluation, conformité, accès aux marchés et approvisionnement | Avesur Consulting",
-      "Six services : analyse des débouchés, audit et assurance, évaluation réglementaire et de conformité, accès aux marchés transfrontaliers, préparation aux marchés publics et sous-traitance principale."],
+      "Analyse des débouchés, audit et assurance, conformité réglementaire, accès aux marchés transfrontaliers, marchés publics et automatisation de la conformité."],
     "about.html": ["À propos d'Avesur Consulting | Basée à Ottawa, dirigée par une femme, fondée en 2011",
-      "Avesur Consulting Inc. est une firme d'Ottawa, 100 % canadienne et dirigée par une femme, fondée en 2011 et spécialisée en validation indépendante, assurance et conformité."],
+      "Avesur Consulting Inc. : firme d'Ottawa canadienne, dirigée par une femme et fondée en 2011, spécialisée en validation indépendante, assurance et conformité."],
     "how-we-work.html": ["Notre méthode | Méthodologie d'évaluation d'Avesur Consulting",
-      "Le processus en six phases d'Avesur, les cadres selon lesquels nous évaluons (NIST, ITSG-33, EMR-1, ISO 19011, ISO/IEC 17065) et comment nous transformons les normes techniques en tests mesurables et automatisables."],
+      "Notre processus en six phases, nos cadres d'évaluation (NIST, ITSG-33, EMR-1, ISO 19011, ISO/IEC 17065) et comment nous rendons les normes mesurables."],
     "contact.html": ["Joindre Avesur Consulting | Réserver une consultation",
-      "Dites-nous ce que vous cherchez à accomplir. Réservez une consultation sur les évaluations, la conformité, l'accès aux marchés, la préparation aux marchés publics ou la sous-traitance."]
+      "Dites-nous ce que vous voulez accomplir. Consultation sur les évaluations, la conformité, l'accès aux marchés, les marchés publics ou la sous-traitance."]
   },
   es: {
     "index.html": ["Avesur Consulting | Evaluación independiente, cumplimiento y acceso a mercados",
-      "Avesur Consulting identifica los requisitos que separan a su organización de su objetivo, evalúa dónde se encuentra y le ayuda a cumplirlos. Canadá, México y Estados Unidos."],
+      "Evaluación independiente, cumplimiento y acceso a mercados en Canadá, México y Estados Unidos. Identificamos los requisitos y le ayudamos a cumplirlos."],
     "services.html": ["Servicios: evaluación, cumplimiento, acceso a mercados y compras públicas | Avesur Consulting",
-      "Seis servicios: análisis de oportunidades de mercado, auditoría y aseguramiento, evaluación regulatoria y de cumplimiento, entrada a mercados transfronterizos, preparación para compras públicas y contratación principal."],
+      "Análisis de mercado, auditoría y aseguramiento, cumplimiento regulatorio, entrada a mercados, preparación para compras públicas y automatización."],
     "about.html": ["Acerca de Avesur Consulting | Con sede en Ottawa, liderada por una mujer, desde 2011",
-      "Avesur Consulting Inc. es una firma con sede en Ottawa, 100 % canadiense y liderada por una mujer, fundada en 2011 y especializada en validación independiente, aseguramiento y cumplimiento."],
+      "Avesur Consulting Inc.: firma de Ottawa, 100 % canadiense y liderada por una mujer, fundada en 2011, especializada en validación independiente y cumplimiento."],
     "how-we-work.html": ["Cómo Trabajamos | Metodología de evaluación de Avesur Consulting",
-      "El proceso de seis fases de Avesur, los marcos con los que evaluamos (NIST, ITSG-33, TRA-1, ISO 19011, ISO/IEC 17065) y cómo convertimos normas técnicas en pruebas medibles y automatizables."],
+      "Nuestro proceso de seis fases, los marcos con que evaluamos (NIST, ITSG-33, TRA-1, ISO 19011, ISO/IEC 17065) y cómo convertimos normas en pruebas medibles."],
     "contact.html": ["Contacto Avesur Consulting | Agende una consulta",
-      "Cuéntenos qué quiere lograr. Agende una consulta sobre evaluaciones, cumplimiento, entrada a mercados, preparación para compras públicas o contratación principal."]
+      "Cuéntenos qué quiere lograr. Agende una consulta sobre evaluaciones, cumplimiento, entrada a mercados, compras públicas o contratación principal."]
   }
 };
 
-const urlFor = (lang, page) => BASE + LANGS[lang].dir + (page === "index.html" ? "" : page);
+// public URLs have no .html extension (Netlify serves services.html at /services)
+const clean = page => page === "index.html" ? "" : page.replace(/\.html$/, "");
+const urlFor = (lang, page) => BASE + LANGS[lang].dir + clean(page);
 // relative link from (fromLang) page to (toLang) page
-const rel = (from, to, page) => (from === "en" ? "" : "../") + LANGS[to].dir + page;
+const rel = (from, to, page) => ((from === "en" ? "" : "../") + LANGS[to].dir + clean(page)) || "./";
 const fixPath = v => v.replace(/(^|[\s,])(assets\/|favicon\.ico|site\.webmanifest)/g, "$1../$2");
 
 for (const page of PAGES) {
@@ -54,6 +58,7 @@ for (const page of PAGES) {
       $("[data-i18n]").each((_, el) => { const v = d[$(el).attr("data-i18n")]; if (v) $(el).html(v); });
       $("[data-i18n-ph]").each((_, el) => { const v = d[$(el).attr("data-i18n-ph")]; if (v) $(el).attr("placeholder", v); });
       $("[data-i18n-aria]").each((_, el) => { const v = d[$(el).attr("data-i18n-aria")]; if (v) $(el).attr("aria-label", v); });
+      $("[data-i18n-alt]").each((_, el) => { const v = d[$(el).attr("data-i18n-alt")]; if (v) $(el).attr("alt", v); });
       const [t, desc] = META[lang][page];
       $("title").text(t);
       $('meta[name="description"]').attr("content", desc);
@@ -77,6 +82,10 @@ for (const page of PAGES) {
     // no runtime translation needed
     $('script[src$="i18n.js"]').remove();
     if (LIVE) { $('meta[name="robots"]').remove(); }
+    if (GA4_ID) {
+      $("head").append(`\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${GA4_ID}"></script>\n` +
+        `  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","${GA4_ID}");</script>\n`);
+    }
     const out = path.join(SITE, LANGS[lang].dir, page);
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, $.html());
@@ -92,6 +101,9 @@ for (const page of PAGES) for (const lang of Object.keys(LANGS)) {
 }
 fs.writeFileSync(path.join(SITE, "sitemap.xml"), sm + "</urlset>\n");
 fs.writeFileSync(path.join(SITE, "robots.txt"), LIVE ? `User-agent: *\nAllow: /\nSitemap: ${BASE}sitemap.xml\n` : "User-agent: *\nDisallow: /\n");
+// 301 the old .html addresses to the clean URLs
+fs.writeFileSync(path.join(SITE, "_redirects"), PAGES.flatMap(page => Object.keys(LANGS).map(lang =>
+  `/${LANGS[lang].dir}${page}  /${LANGS[lang].dir}${clean(page)}  301!`)).join("\n") + "\n");
 fs.writeFileSync(path.join(SITE, "_headers"), (LIVE ? "" : "/*\n  X-Robots-Tag: noindex, nofollow\n") +
   "/assets/*\n  Cache-Control: public, max-age=604800\n");
-console.log("Built " + PAGES.length * 3 + " pages" + (LIVE ? " (live)" : " (noindex)"));
+console.log("Built " + PAGES.length * 3 + " pages" + (LIVE ? " (live)" : " (noindex)") + (GA4_ID ? ", GA4 " + GA4_ID : ", no GA4"));

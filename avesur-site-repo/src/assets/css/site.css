@@ -156,6 +156,7 @@ p, ul, ol, dl, dd, figure { margin: 0; }
 .paths { list-style: none; padding: 0; margin-top: 48px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px; }
 .paths strong { display: block; font-family: var(--serif); font-weight: 600; font-size: 1.25rem; line-height: 1.25; }
 .paths span { display: block; margin-top: 10px; color: var(--text-muted); font-size: 0.95rem; }
+.paths li:only-child { grid-column: 1 / -1; max-width: 720px; }
 
 /* ---------- audiences ---------- */
 .who { list-style: none; padding: 0; margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 72px; }
